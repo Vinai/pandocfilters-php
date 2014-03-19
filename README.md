@@ -20,3 +20,5 @@ Pandoc_Filter::toJSONFilter(function ($type, $value, $format, $meta) {
 ```
 
 More examples and more information can be found in the original reporitory.
+
+Thanks to John MacFarlane for pandoc.
