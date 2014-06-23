@@ -139,7 +139,7 @@ class Pandoc_Filter
      * @return callable
      * @throws BadMethodCallException
      */
-    public function elt($eltType, $numArgs)
+    public static function elt($eltType, $numArgs)
     {
         $fun = function() use ($eltType, $numArgs) {
             $lenargs = func_num_args();
@@ -158,3 +158,40 @@ class Pandoc_Filter
         return $fun;
     }
 }
+
+# Constructors for block elements
+
+//$Plain = Pandoc_Filter::elt('Plain',1);
+//$Para = Pandoc_Filter::elt('Para',1);
+//$CodeBlock = Pandoc_Filter::elt('CodeBlock',2);
+//$RawBlock = Pandoc_Filter::elt('RawBlock',2);
+//$BlockQuote = Pandoc_Filter::elt('BlockQuote',1);
+//$OrderedList = Pandoc_Filter::elt('OrderedList',2);
+//$BulletList = Pandoc_Filter::elt('BulletList',1);
+//$DefinitionList = Pandoc_Filter::elt('DefinitionList',1);
+//$Header = Pandoc_Filter::elt('Header',3);
+//$HorizontalRule = Pandoc_Filter::elt('HorizontalRule',0);
+//$Table = Pandoc_Filter::elt('Table',5);
+//$Div = Pandoc_Filter::elt('Div',2);
+//$Null = Pandoc_Filter::elt('Null',0);
+
+# Constructors for inline elements
+
+//$Str = Pandoc_Filter::elt('Str',1);
+//$Emph = Pandoc_Filter::elt('Emph',1);
+//$Strong = Pandoc_Filter::elt('Strong',1);
+//$Strikeout = Pandoc_Filter::elt('Strikeout',1);
+//$Superscript = Pandoc_Filter::elt('Superscript',1);
+//$Subscript = Pandoc_Filter::elt('Subscript',1);
+//$SmallCaps = Pandoc_Filter::elt('SmallCaps',1);
+//$Quoted = Pandoc_Filter::elt('Quoted',2);
+//$Cite = Pandoc_Filter::elt('Cite',2);
+//$Code = Pandoc_Filter::elt('Code',2);
+//$Space = Pandoc_Filter::elt('Space',0);
+//$LineBreak = Pandoc_Filter::elt('LineBreak',0);
+//$Math = Pandoc_Filter::elt('Math',2);
+//$RawInline = Pandoc_Filter::elt('RawInline',2);
+//$Link = Pandoc_Filter::elt('Link',2);
+//$Image = Pandoc_Filter::elt('Image',2);
+//$Note = Pandoc_Filter::elt('Note',1);
+//$Span = Pandoc_Filter::elt('Span',2);
