@@ -137,6 +137,7 @@ class Pandoc_Filter
      * @param string $eltType
      * @param int $numArgs
      * @return callable
+     * @throws BadMethodCallException
      */
     public function elt($eltType, $numArgs)
     {
