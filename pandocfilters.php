@@ -132,4 +132,28 @@ class Pandoc_Filter
         }
         return array($ident, $classes, $keyvals);
     }
+    
+    /**
+     * @param string $eltType
+     * @param int $numArgs
+     * @return callable
+     */
+    public function elt($eltType, $numArgs)
+    {
+        $fun = function() use ($eltType, $numArgs) {
+            $lenargs = func_num_args();
+            if ($lenargs != $numArgs) {
+                throw new BadMethodCallException(sprintf(
+                    "%s expects %d arguments, but given %d", $eltType, $numArgs, $lenargs
+                ));
+            }
+            if ($lenargs == 1) {
+                $xs = func_get_arg(0);
+            } else {
+                $xs = func_get_args();
+            }
+            return (object) array('t' => $eltType, 'c' => $xs);
+        };
+        return $fun;
+    }
 }
