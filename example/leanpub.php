@@ -104,7 +104,7 @@ class BlockEmulation
         return is_object($value) && $value->t === 'Str' && $value->c === $this->name;
     }
 
-    public function matchesElement($type, $value) {
+    public function matchesBlockElement($type, $value) {
         if ('Para' == $type && count($value) >= 2) {
             return $this->matches($value[0]) && 'Space' === $value[1]->t;
         }
@@ -141,7 +141,7 @@ use ($blocks, $LineBreak, $Para, $RawBlock) {
     if (!$format) $format = 'latex';
 
     foreach ($blocks as $block) {
-        if ($block->matchesElement($type, $value)) {
+        if ($block->matchesBlockElement($type, $value)) {
             $res[] = $RawBlock($format, $block->open($format));
             $res[] = $Para($block->replaceSelf(array_slice($value, 2), $LineBreak()));
             $res[] = $RawBlock($format, $block->close($format));
