@@ -127,6 +127,13 @@ class BlockEmulation
     }
 }
 
+/**
+ * Variables declared in pandocfilters.php
+ * 
+ * @global callable $LineBreak
+ * @global callable $Para
+ * @global callable $RawBlock
+ */
 \Pandoc_Filter::toJSONFilter(function ($type, $value, $format, $meta)
 use ($blocks, $LineBreak, $Para, $RawBlock) {
 
