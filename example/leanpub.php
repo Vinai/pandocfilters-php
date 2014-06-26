@@ -127,11 +127,6 @@ class BlockEmulation
     }
 }
 
-// Pandoc Block Factories
-$LineBreak = \Pandoc_Filter::elt('LineBreak', 0);
-$Para = \Pandoc_Filter::elt('Para', 1);
-$RawBlock = \Pandoc_Filter::elt('RawBlock', 2);
-
 \Pandoc_Filter::toJSONFilter(function ($type, $value, $format, $meta)
 use ($blocks, $LineBreak, $Para, $RawBlock) {
 
