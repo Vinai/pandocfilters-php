@@ -130,9 +130,9 @@ class BlockEmulation
 /**
  * Variables declared in pandocfilters.php
  * 
- * @global callable $LineBreak
- * @global callable $Para
- * @global callable $RawBlock
+ * @global callable $LineBreak Linebreak Element Factory
+ * @global callable $Para Paragraph Element Factory
+ * @global callable $RawBlock Raw Block Element Factory
  */
 \Pandoc_Filter::toJSONFilter(function ($type, $value, $format, $meta)
 use ($blocks, $LineBreak, $Para, $RawBlock) {
