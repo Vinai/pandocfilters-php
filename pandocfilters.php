@@ -95,22 +95,22 @@ class Pandoc_Filter
      */
     public static function stringify($x)
     {
-        $result = array();
-        $go = function($key, $val, $format, $meta) use ($result) {
+        $o = (object) array('result' => array());
+        $go = function($key, $val, $format, $meta) use ($o) {
             if ('Str' == $key) {
-                $result[] = $val;
+                $o->result[] = $val;
             } elseif ('Code' == $key) {
-                $result[] = $val[1];
+                $o->result[] = $val[1];
             } elseif ('Math' == $key) {
-                $result[] = $val[1];
+                $o->result[] = $val[1];
             } elseif ('LineBreak' == $key) {
-                $result[] = " ";
+                $o->result[] = " ";
             } elseif ('Space' == $key) {
-                $result[] = " ";
+                $o->result[] = " ";
             }
         };
         self::walk($x, $go, '', array());
-        return implode('', $result);
+        return implode('', $o->result);
     }
     
     /**
