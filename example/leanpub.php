@@ -110,6 +110,10 @@ class BlockEmulation
         }
         return false;
     }
+    
+    public function matchesSpace($value) {
+        return is_object($value) && $value->t === 'Space';
+    }
 
     public function open($format) {
         return @$this->formats[$format][0] ? : '';
@@ -125,25 +129,153 @@ class BlockEmulation
         }
         return $value;
     }
+    
+    public function getLines(array $value) {
+        $lines = array();
+        $lnum = -1;
+        foreach ($value as $item) {
+            if ($this->matches($item)) {
+                $lnum++; // start new line, also leave out the block identifier
+            } elseif (! isset($lines[$lnum]) && $this->matchesSpace($item)){
+                // leave out spaces at the beginning of the line
+            } else {
+                $lines[$lnum][] = $item;
+            }
+        }
+        return $lines;
+    }
 }
 
 /**
- * Variables declared in pandocfilters.php
- * 
+ * @param callable $prev
+ * @param callable $current
+ * @global callable $Header Header Element Factory
+ * @return bool
+ */
+$isContextComplete = function($prev, $current) 
+use ($Header){
+    if ($prev && $prev !== $current) {
+        return true;
+    }
+    if ($Header === $prev) {
+        return true;
+    }
+    return false;
+};
+
+/**
+ * @param array $line
+ * @param callable $default
+ * @global callable $BulletList Bullet List Element Factory
+ * @global callable $Header Header Element Factory
+ * @return callable
+ */
+$getLineContext = function (array $line, $default) 
+use($BulletList, $Header) {
+    if ($line[0]->t == 'Str' && $line[0]->c == '*' && (! isset($line[1]->c) || $line[1]->t == 'Space')) {
+        return $BulletList;
+    }
+    if ($line[0]->t == 'Str' && $line[0]->c == '#' && (! isset($line[1]->c) || $line[1]->t == 'Space')) {
+        return $Header;
+    }
+    return $default;
+};
+
+/**
+ * @param array $line
+ * @param string $context
  * @global callable $LineBreak Linebreak Element Factory
  * @global callable $Para Paragraph Element Factory
  * @global callable $RawBlock Raw Block Element Factory
+ * @global callable $BulletList Bullet List Element Factory
+ * @global callable $Plain Plain Element Factory (Non-Paragraph String)
+ * @global callable $Header Header Element Factory
+ * @return array|object
+ */
+$processLineInContext = function(array $line, $context)
+use ($LineBreak, $Para, $RawBlock, $BulletList, $Plain, $Header) {
+    switch ($context) {
+        case $Para:
+        case $Plain:
+            $line[] = $LineBreak();
+            break;
+        case $BulletList:
+            $line = array_slice($line, 2);
+            $line = array($Plain($line));
+            break;
+        case $Header:
+            $line = array_slice($line, 2);
+            $anchor = \Pandoc_Filter::stringify($line);
+            $anchor = trim(preg_replace('/[^0-9a-z]/', '-', strtolower($anchor)), '-');
+            $line = $Header(2, array($anchor, array(), array()), $line);
+            break;
+    }
+    return $line;
+};
+
+/**
+ * @param callable $context
+ * @param array $content
+ * @global callable $Para Para Element Factory
+ * @global callable $BulletList Bullet List Element Factory
+ * @global callable $Header Header Element Factory
+ * @global callable $Plain Plain Element Factory
+ * @return object|bool
+ */
+$closeContext = function($context, array $content)
+use ($Para, $BulletList, $Header, $Plain) {
+    switch ($context) {
+        case $Plain:
+        case $Para:
+            // Merge all Para content into one array (with LineBreaks)
+            $c = array();
+            foreach ($content as $line) {
+                $c = array_merge($c, $line);
+            }
+            return $context(array_slice($c, 0, -1));
+        case $BulletList: return $context($content);
+        case $Header: return $content[0];
+    }
+};
+
+/**
+ * Variables declared in pandocfilters.php and a few closures from this file.
+ * 
+ * @global BlockEmulation[] $blocks List of leanpub block definitions instances
+ * @global callable $getLineContext Return context callable for current line
+ * @global callable $processLineInContext Process line according to context
+ * @global callable $isContextComplete Return true if current context needs closing
+ * @global callable $closeContext Close current context and return element
+ * @global callable $RawBlock Raw Block Element Factory
+ * @global callable $Plain Default Block Element Factory (Para or Plain)
  */
 \Pandoc_Filter::toJSONFilter(function ($type, $value, $format, $meta)
-use ($blocks, $LineBreak, $Para, $RawBlock) {
+use ($blocks, $getLineContext, $processLineInContext, $isContextComplete, $closeContext, $RawBlock, $Para) {
 
     // default format, mainly for testing
     if (!$format) $format = 'latex';
+    $defaultContext = $Para;
 
     foreach ($blocks as $block) {
         if ($block->matchesBlockElement($type, $value)) {
             $res[] = $RawBlock($format, $block->open($format));
-            $res[] = $Para($block->replaceSelf(array_slice($value, 2), $LineBreak()));
+            $ccontext = ''; // current block element context
+            $clines = array(); // lines in current block
+            
+            foreach ($block->getLines($value) as $line) {
+                $lcontext = $getLineContext($line, $defaultContext);
+                if ($isContextComplete($ccontext, $lcontext) && $clines) {
+                    if ($elt = $closeContext($ccontext, $clines)) {
+                        $res[] = $elt;
+                    }
+                    $clines = array();
+                }
+                $clines[] = $processLineInContext($line, $lcontext);
+                $ccontext = $lcontext;
+            }
+            if ($clines && ($elt = $closeContext($ccontext, $clines))) {
+                $res[] = $elt;
+            }
             $res[] = $RawBlock($format, $block->close($format));
             return $res;
         }
