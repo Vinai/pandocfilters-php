@@ -5,7 +5,7 @@ https://github.com/jgm/pandocfilters
 
 The purpose is simply to make it easier to write filters in PHP
 
-```{.php}
+```php
 #!/usr/bin/env php
 <?php
 
@@ -20,6 +20,8 @@ Pandoc_Filter::toJSONFilter(function ($type, $value, $format, $meta) {
 
 ```
 
-More examples and more information can be found in the original reporitory.
+More examples and more information can be found in the original repository.
+Dave Jarvis has opened a PR with a bit more information. Until it is merged it can be found here:  
+https://github.com/DaveJarvis/pandocfilters/tree/patch-1
 
 Thanks to John MacFarlane for pandoc.
