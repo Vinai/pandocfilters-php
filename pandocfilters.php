@@ -11,10 +11,16 @@
 class Pandoc_Filter
 {
     public static $source = 'php://stdin';
-    
+
     /**
      * Walk a tree, applying an action to every object.
      * Returns a modified tree.
+     * 
+     * @param array|object|string $x
+     * @param callable $action
+     * @param mixed $format
+     * @param mixed $meta
+     * @return array|object|string
      */
     public static function walk($x, $action, $format, $meta)
     {
@@ -69,12 +75,13 @@ class Pandoc_Filter
      * the list to which the target object belongs. (So, returning an
      * empty list deletes the object.)
      * 
-     * @param $action
+     * @param callable $action
+     * @param string $source (For debugging purposes)
      */
-    public static function toJSONFilter($action)
+    public static function toJSONFilter($action, $source = null)
     {
-        
-        $doc = json_decode(file_get_contents(self::$source));
+        if (! $source) $source = self::$source;
+        $doc = json_decode(file_get_contents($source));
         if (count($GLOBALS['argv']) > 1) {
             $format = $GLOBALS['argv'][1];
         } else {
@@ -90,7 +97,7 @@ class Pandoc_Filter
      * Walks the tree x and returns concatenated string content,
      * leaving out all formatting.
      * 
-     * @param $x
+     * @param array|object|string $x
      * @return string
      */
     public static function stringify($x)
