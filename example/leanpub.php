@@ -7,7 +7,7 @@
  * Supported block types: D>, E>, X>, I>, Q>, T>, W>
  * Supported output formats are latex, html and epub.
  * For LaTeX (and PDF) the corresponding \lp... commands
- * have to be added to the .latex template (please refer 
+ * have to be added to the .latex template (please refer
  * to the issue comment link below for an example).
  *
  * Example markdown:
@@ -19,7 +19,7 @@
  *
  * Issue comment containing the leanpub LaTeX:
  * https://github.com/Vinai/pandocfilters-php/issues/2#issuecomment-47204574
- * 
+ *
  * @author Vinai Kopp
  * @contributor Gary Jones
  * @copyright Copyright (c) 2014, Vinai Kopp
@@ -110,7 +110,7 @@ class BlockEmulation
         }
         return false;
     }
-    
+
     public function matchesSpace($value) {
         return is_object($value) && $value->t === 'Space';
     }
@@ -129,7 +129,7 @@ class BlockEmulation
         }
         return $value;
     }
-    
+
     public function getLines(array $value) {
         $lines = array();
         $lnum = -1;
@@ -152,7 +152,7 @@ class BlockEmulation
  * @global callable $Header Header Element Factory
  * @return bool
  */
-$isContextComplete = function($prev, $current) 
+$isContextComplete = function($prev, $current)
 use ($Header){
     if ($prev && $prev !== $current) {
         return true;
@@ -170,7 +170,7 @@ use ($Header){
  * @global callable $Header Header Element Factory
  * @return callable
  */
-$getLineContext = function (array $line, $default) 
+$getLineContext = function (array $line, $default)
 use($BulletList, $Header) {
     if ($line[0]->t == 'Str' && $line[0]->c == '*' && (! isset($line[1]->c) || $line[1]->t == 'Space')) {
         return $BulletList;
@@ -240,7 +240,7 @@ use ($Para, $BulletList, $Header, $Plain) {
 
 /**
  * Variables declared in pandocfilters.php and a few closures from this file.
- * 
+ *
  * @global BlockEmulation[] $blocks List of leanpub block definitions instances
  * @global callable $getLineContext Return context callable for current line
  * @global callable $processLineInContext Process line according to context
@@ -261,7 +261,7 @@ use ($blocks, $getLineContext, $processLineInContext, $isContextComplete, $close
             $res[] = $RawBlock($format, $block->open($format));
             $ccontext = ''; // current block element context
             $clines = array(); // lines in current block
-            
+
             foreach ($block->getLines($value) as $line) {
                 $lcontext = $getLineContext($line, $defaultContext);
                 if ($isContextComplete($ccontext, $lcontext) && $clines) {
