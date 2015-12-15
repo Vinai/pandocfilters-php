@@ -2,7 +2,7 @@
 <?php
 
 /**
- * Performs manipulations of Markdown text to help make a manuscript, such as 
+ * Performs manipulations of Markdown text to help make a manuscript, such as
  * described at http://www.shunn.net/format/story.html
  *
  * Requirements
@@ -20,24 +20,20 @@ if (file_exists(__DIR__ . '/pandocfilters.php')) {
 }
 
 
-Pandoc_Filter::toJSONFilter(function ($key, $value, $format, $meta)
+Pandoc_Filter::toJSONFilter(function ($key, $value, $format, $meta) 
 use ($Str, $Header) {
 
     if ($key === 'Image') {
         // Images are not allowed inside manuscripts.
         return $Str('');
-    } else {
-        if ($key === 'Link') {
-            // Extract the hyperlink text, discard the URL.
-            return $Str(Pandoc_Filter::stringify($value));
-        } else {
-            if ($key === 'Header' && $value[0] == 2) {
-                // Make the header titlecase.
-                $s = $Str(ucwords(Pandoc_Filter::stringify($value[2])));
+    } elseif ($key === 'Link') {
+        // Extract the hyperlink text, discard the URL.
+        return $Str(Pandoc_Filter::stringify($value));
+    } elseif ($key === 'Header' && $value[0] == 2) {
+        // Make the header level 2 titlecase.
+        $s = $Str(ucwords(Pandoc_Filter::stringify($value[2])));
 
-                // Replace the old header with the new header.
-                return $Header($value[0], $value[1], [$s]);
-            }
-        }
+        // Replace the old header with the new header.
+        return $Header($value[0], $value[1], [$s]);
     }
 });
