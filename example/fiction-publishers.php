@@ -2,7 +2,8 @@
 <?php
 
 /**
- * Performs manipulations of Markdown text to help make a manuscript.
+ * Performs manipulations of Markdown text to help make a manuscript, such as 
+ * described at http://www.shunn.net/format/story.html
  *
  * Requirements
  *
